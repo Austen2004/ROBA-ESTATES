@@ -11,7 +11,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["agent", "owner", "admin"],
       default: "agent"
-    }
+    },
+    resetTokenHash: { type: String },
+    resetTokenExpires: { type: Date }
   },
   { timestamps: true }
 );

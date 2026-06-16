@@ -4,12 +4,34 @@ import { API_BASE } from "../config";
 
 export default function AgentLogin({ onLoggedIn }) {
   const { login } = useAuth();
-  const [mode, setMode] = useState("login"); // "login" | "register"
+  const [mode, setMode] = useState("login"); // "login" | "register" | "forgot"
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", role: "agent" });
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const update = (key, value) => setForm((f) => ({ ...f, [key]: value }));
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      setMessage(data.message);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,6 +59,45 @@ export default function AgentLogin({ onLoggedIn }) {
       setLoading(false);
     }
   };
+
+  if (mode === "forgot") {
+    return (
+      <div className="auth-card">
+        <h2>Reset your password</h2>
+        <p className="auth-subtitle">
+          Enter your account email and we'll send you a link to reset your password.
+        </p>
+
+        <form onSubmit={handleForgotPassword} className="auth-form">
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            value={form.email}
+            onChange={(e) => update("email", e.target.value)}
+          />
+
+          {error && <p className="auth-error">{error}</p>}
+          {message && <p className="upload-success">{message}</p>}
+
+          <button type="submit" disabled={loading}>
+            {loading ? "Sending..." : "Send reset link"}
+          </button>
+        </form>
+
+        <button
+          className="auth-switch"
+          onClick={() => {
+            setMode("login");
+            setError("");
+            setMessage("");
+          }}
+        >
+          Back to log in
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-card">
@@ -88,6 +149,18 @@ export default function AgentLogin({ onLoggedIn }) {
           {loading ? "Please wait..." : mode === "login" ? "Log in" : "Create account"}
         </button>
       </form>
+
+      {mode === "login" && (
+        <button
+          className="auth-switch"
+          onClick={() => {
+            setMode("forgot");
+            setError("");
+          }}
+        >
+          Forgot your password?
+        </button>
+      )}
 
       <button
         className="auth-switch"

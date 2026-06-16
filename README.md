@@ -91,6 +91,22 @@ await fetch("/api/properties", {
 });
 ```
 
+## Forgot password feature
+
+Agents/owners can reset a forgotten password via emailed link (`/api/auth/forgot-password` and `/api/auth/reset-password`). Email sending uses [Resend](https://resend.com) (free tier: 100 emails/day).
+
+Setup:
+1. Sign up at resend.com (no credit card required)
+2. Copy your API key from the dashboard
+3. Add to `backend/.env` (and Render's environment variables):
+   ```
+   RESEND_API_KEY=re_your_key_here
+   FRONTEND_URL=https://your-live-site.netlify.app
+   ```
+4. By default Resend's sandbox only sends to your own verified email. To send to any user, verify a domain under Resend → Domains, then set `FROM_EMAIL` to an address on that domain.
+
+If `RESEND_API_KEY` isn't set, the reset link is logged to the backend console instead of emailed (useful for local testing).
+
 ## Suggested next steps
 
 1. Build a simple "agent dashboard" page (login, create/edit listings, view inquiries).

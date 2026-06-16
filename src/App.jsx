@@ -4,10 +4,13 @@ import FilterBar from "./components/FilterBar";
 import PropertyCard from "./components/PropertyCard";
 import PropertyDetail from "./components/PropertyDetail";
 import AgentDashboard from "./components/AgentDashboard";
+import ResetPassword from "./components/ResetPassword";
 import { AuthProvider } from "./context/AuthContext";
 import "./App.css";
 
 function AppContent() {
+  const isResetPasswordPage = window.location.pathname === "/reset-password";
+
   const [filters, setFilters] = useState({
     query: "",
     type: "",
@@ -28,6 +31,24 @@ function AppContent() {
       return matchesQuery && matchesType && matchesPurpose && matchesPrice;
     });
   }, [filters]);
+
+  if (isResetPasswordPage) {
+    return (
+      <div className="app">
+        <header className="site-header">
+          <div className="brand">
+            <span className="brand-mark">R</span>
+            <div>
+              <h1>Roba Estates</h1>
+            </div>
+          </div>
+        </header>
+        <main className="site-main">
+          <ResetPassword />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
