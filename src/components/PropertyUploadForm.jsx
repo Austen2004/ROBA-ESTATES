@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE } from "../config";
 
 const initialForm = {
   title: "",
@@ -41,7 +42,7 @@ export default function PropertyUploadForm() {
 
       files.forEach((file) => data.append("images", file));
 
-      const res = await fetch("/api/properties", {
+      const res = await fetch(`${API_BASE}/api/properties`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data

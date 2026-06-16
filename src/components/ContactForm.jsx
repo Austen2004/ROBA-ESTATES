@@ -1,17 +1,30 @@
 import React, { useState } from "react";
+import { API_BASE } from "../config";
 
 export default function ContactForm({ property }) {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const update = (key, value) => setForm((f) => ({ ...f, [key]: value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: replace with POST to backend, e.g.
-    // fetch(`/api/properties/${property.id}/inquiries`, { method: "POST", body: JSON.stringify(form) })
-    console.log("Inquiry submitted", { propertyId: property.id, ...form });
-    setSent(true);
+    setError("");
+    try {
+      const res = await fetch(`${API_BASE}/api/inquiries`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ propertyId: property.id, ...form })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to send inquiry");
+      }
+      setSent(true);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   if (sent) {
@@ -49,6 +62,7 @@ export default function ContactForm({ property }) {
         value={form.message}
         onChange={(e) => update("message", e.target.value)}
       />
+      {error && <p className="auth-error">{error}</p>}
       <button type="submit">Send inquiry</button>
     </form>
   );
